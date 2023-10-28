@@ -24,6 +24,7 @@ import static com.example.demo.security.SecurityConstants.*;
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
+
 	private Logger logger = LoggerFactory.getLogger(OrderController.class);
 	
 	@Autowired
@@ -31,8 +32,20 @@ public class OrderController {
 	
 	@Autowired
 	private OrderRepository orderRepository;
-	
-	
+
+	public OrderController() {
+	}
+	@Autowired
+	public OrderController(UserRepository userRepository, OrderRepository orderRepository) {
+		this.userRepository = userRepository;
+		this.orderRepository = orderRepository;
+	}
+//	public OrderController(Logger logger, UserRepository userRepository, OrderRepository orderRepository) {
+//		this.logger = logger;
+//		this.userRepository = userRepository;
+//		this.orderRepository = orderRepository;
+//	}
+
 	@PostMapping("/submit/{username}")
 	public ResponseEntity<UserOrder> submit(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);

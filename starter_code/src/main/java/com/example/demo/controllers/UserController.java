@@ -7,6 +7,7 @@ import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +18,18 @@ import static com.example.demo.security.SecurityConstants.*;
 @RequestMapping("/api/user")
 public class UserController {
     private Logger logger = LoggerFactory.getLogger(UserController.class);
-
+    @Autowired
     private UserRepository userRepository;
-
+    @Autowired
     private CartRepository cartRepository;
-
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserController(UserRepository userRepository, CartRepository cartRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserController() {
+    }
+
+    public UserController(Logger logger, UserRepository userRepository, CartRepository cartRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.logger = logger;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -32,8 +37,13 @@ public class UserController {
 
     @GetMapping("/id/{id}")
     public ResponseEntity<User> findById(@PathVariable Long id) {
-        logger.error("Method: {}, Status: {} , id: {}", "findById", FAIL, id);
-        return ResponseEntity.of(userRepository.findById(id));
+        User user = userRepository.findById(id)
+                .orElse(null);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{username}")
